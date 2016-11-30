@@ -1,3 +1,12 @@
+/*
+   Creates the NBA datatables.
+
+   Authors:
+   Alex Ye, aye01
+   Robert Franklin Mathews IV, rfmathew
+   Esteban Ray Ramos, eramos04
+*/
+
 CREATE TABLE `Teams`(
    TeamId INT NOT NULL,
    Name VARCHAR(255) NOT NULL,
