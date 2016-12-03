@@ -10,43 +10,43 @@
 CREATE TABLE `Teams`(
    TeamId INT NOT NULL,
    Name VARCHAR(255) NOT NULL,
+   Code VARCHAR(3) NOT NULL,
    City VARCHAR(100) NOT NULL,
    State VARCHAR(2) NOT NULL,
-   Year INT NOT NULL,
    PRIMARY KEY(TeamId),
    UNIQUE(Name, Year)
 );
 
-CREATE TABLE `People`(
-   Id INT NOT NULL,
-   First VARCHAR(100) NOT NULL,
-   Middle VARCHAR(100) NOT NULL,
-   Last VARCHAR(255) NOT NULL,
-   PRIMARY KEY(Id)
-);
-
 CREATE TABLE `Players`(
-   PlayerId INT NOT NULL,
-   Team INT NOT NULL,
+   Player VARCHAR(255) NOT NULL,
+   Pos VARCHAR(2),
+   Age INT,
+   Team INT,
+   GP INT,
+   GS INT,
+   MIN INT,
+   FGM INT,
+   FGA INT,
+   3PM INT,
+   3PA INT,
+   2PM INT,
+   2PA INT,
+   FTM INT,
+   FTA INT,
+   ORB INT,
+   DRB INT,
+   AST INT,
+   STL INT,
+   BLK INT,
+   TOV INT,
+   PF INT,
+   PTS INT,
    Year INT NOT NULL,
-   Height FLOAT,
-   Weight FLOAT,
-   GP FLOAT,
-   MIN FLOAT,
-   PTS FLOAT,
-   FGM FLOAT,
-   FGA FLOAT,
-   3PM FLOAT,
-   3PA FLOAT,
-   PlusMinus FLOAT,
-   Rookie BOOLEAN,
-   Jersey INT,
-   FOREIGN KEY(PlayerId) REFERENCES `People`(Id),
-   PRIMARY KEY(PlayerId, Team, Year)
+   PRIMARY KEY(Player, Year)
 );
 
 CREATE TABLE `Coaches`(
-   CoachId INT NOT NULL,
+   CoachId INT NOT NULL, -- This is no longer an identifier for a Coach
    Team INT NOT NULL,
    Year INT NOT NULL,
    FOREIGN KEY(CoachId) REFERENCES `People`(Id),
@@ -55,14 +55,16 @@ CREATE TABLE `Coaches`(
 );
 
 CREATE TABLE `Playoffs`(
+   Date DATE NOT NULL,
+   Visitor INT NOT NULL,
+   vScore INT NOT NULL,
    Home INT NOT NULL,
-   Away INT NOT NULL,
+   hScore INT NOT NULL,
    GameNumber INT NOT NULL,
-   Round INT NOT NULL,
-   Winner ENUM("HOME", "AWAY"),
-   Year INT NOT NULL,
+   YEAR INT NOT NULL,
    FOREIGN KEY(Home) REFERENCES `Teams`(TeamId),
-   Primary Key(Home, Away, GameNumber, Round, Year)
+   FOREIGN KEY(Visitor) REFERENCES `Teams`(TeamId),
+   PRIMARY KEY(Home, Visitor, GameNumber, YEAR)
 );
 
 CREATE TABLE `MVP`(
