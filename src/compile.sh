@@ -1,2 +1,3 @@
 #!/bin/bash
-javac -cp ./jdbc.jar:. NbaData.java SpringUtilities.java
+javac NbaData.java SpringUtilities.java
+java -cp ./mysql-connector-java-5.1.40-bin.jar:. NbaData

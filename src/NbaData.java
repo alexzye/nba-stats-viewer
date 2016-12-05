@@ -48,11 +48,12 @@ public class NbaData extends JPanel {
     private JTextField filterText;
     private JTextField statusText;
     private TableRowSorter<MyTableModel> sorter;
+    private static Connection conn;
 
     public NbaData() {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+        
         //Create a table with a sorter.
         MyTableModel model = new MyTableModel();
         sorter = new TableRowSorter<MyTableModel>(model);
@@ -255,9 +256,34 @@ public class NbaData extends JPanel {
         frame.setVisible(true);
     }
 
+    public static void makeConnection() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            System.out.println("Driver Found");
+        }
+        catch (ClassNotFoundException ex) {
+            System.out.println("Driver not found");
+        };
+        
+        String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/";
+        String user ="admin";
+        String db = "nba";
+        String password="password";
+
+        try {
+            conn = DriverManager.getConnection(url + db, user, password);
+            System.out.println("Connection made");
+        }
+        catch (Exception ex) {
+            System.out.println("Could not open connection");
+        };
+    }
+
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
+        makeConnection();
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
