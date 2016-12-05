@@ -1,5 +1,5 @@
 /*
-   Creates the NBA datatables.
+   Creates the NBA data tables.
 
    Authors:
    Alex Ye, aye01
@@ -8,20 +8,18 @@
 */
 
 CREATE TABLE `Teams`(
-   TeamId INT NOT NULL,
+   Abbrev VARCHAR(3) NOT NULL,
    Name VARCHAR(255) NOT NULL,
-   Code VARCHAR(3) NOT NULL,
-   City VARCHAR(100) NOT NULL,
-   State VARCHAR(2) NOT NULL,
-   PRIMARY KEY(TeamId),
-   UNIQUE(Name, Year)
+   City VARCHAR(30),
+   State VARCHAR(2),
+   PRIMARY KEY(Abbrev)
 );
 
 CREATE TABLE `Players`(
    Player VARCHAR(255) NOT NULL,
-   Pos VARCHAR(2),
+   Pos VARCHAR(6),
    Age INT,
-   Team INT,
+   Team VARCHAR(3),
    GP INT,
    GS INT,
    MIN INT,
@@ -42,7 +40,8 @@ CREATE TABLE `Players`(
    PF INT,
    PTS INT,
    Year INT NOT NULL,
-   PRIMARY KEY(Player, Year)
+   PRIMARY KEY(Player, Team, Year),
+   FOREIGN KEY(Team) REFERENCES `Teams`(Abbrev)
 );
 
 CREATE TABLE `Coaches`(
@@ -68,14 +67,14 @@ CREATE TABLE `Playoffs`(
 );
 
 CREATE TABLE `MVP`(
-   Player INT NOT NULL,
+   Player VARCHAR(255) NOT NULL,
    Year INT NOT NULL,
    PRIMARY KEY(Player, Year),
-   FOREIGN KEY(Player) REFERENCES `People`(Id)
+   FOREIGN KEY(Player, Year) REFERENCES `Players`(Player, Year)
 );
 
 CREATE TABLE `Champions`(
-   Team INT NOT NULL,
+   Team VARCHAR(3) NOT NULL,
    Year INT NOT NULL,
    PRIMARY KEY(Team, Year),
    FOREIGN KEY(Team) REFERENCES `Teams`(TeamId)
