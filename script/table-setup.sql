@@ -68,9 +68,11 @@ CREATE TABLE `Playoffs`(
 
 CREATE TABLE `MVP`(
    Player VARCHAR(255) NOT NULL,
+   Team VARCHAR(3) NOT NULL,
    Year INT NOT NULL,
    PRIMARY KEY(Player, Year),
-   FOREIGN KEY(Player, Year) REFERENCES `Players`(Player, Year)
+   FOREIGN KEY(Player, Team, Year) REFERENCES `Players`(Player, Team, Year)
+   FOREIGN KEY(Team) REFERENCES `Team`(Abbrev)
 );
 
 CREATE TABLE `Champions`(
