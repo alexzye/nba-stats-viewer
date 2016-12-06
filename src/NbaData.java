@@ -30,16 +30,13 @@ public class NbaData extends JPanel {
 
     public NbaData() {
         super();
-        // setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setLayout(new BorderLayout());
         
-
         makeConnection();
         
         ResultSet result = null;
         DefaultTableModel model = null;
         Statement s = null;
-        
         
         try {
             s = conn.createStatement();
@@ -77,20 +74,18 @@ public class NbaData extends JPanel {
         scroll.add(scrollPane);
         JPanel textFields = new JPanel(new BorderLayout());
         textFields.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        // JPanel footerPanel = new JPanel();
+        
 
         add(scroll, BorderLayout.NORTH);
         add(textFields, BorderLayout.WEST);
-        // add(footerPanel, BorderLayout.SOUTH);
-
-        
-        // footerPanel.setPreferredSize(new Dimension(screen.width-20, 300));
         
         
         JLabel l1 = new JLabel("Player", JLabel.CENTER);
         JLabel l2 = new JLabel("Team", JLabel.CENTER);
         JLabel l3 = new JLabel("Year", JLabel.CENTER);
-        
+        JLabel label = new JLabel("Search for according to Player, Team, Year or all 3! Case sensitive. \nExample: Name: Stephen Curry, Team: GSW, Year: 2015");
+        label.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
+
         playerText = new JTextField(10);
         teamText = new JTextField(10);
         yearText = new JTextField(10);
@@ -104,6 +99,7 @@ public class NbaData extends JPanel {
         rightText.add(l3, BorderLayout.NORTH);
         rightText.add(yearText, BorderLayout.CENTER);
 
+        textFields.add(label, BorderLayout.NORTH);
         textFields.add(leftText, BorderLayout.WEST);
         textFields.add(centerText, BorderLayout.CENTER);
         textFields.add(rightText, BorderLayout.EAST);
