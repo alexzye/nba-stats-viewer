@@ -6,25 +6,40 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.Dimension;
 import java.awt.Component;
-import java.util.Vector;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.util.*;
 
+/*
+   GUI Interface for the NBA Data Viewer
+
+   Authors:
+   Alex Ye, aye01
+   Robert Franklin Mathews IV, rfmathew
+   Esteban Ray Ramos, eramos04
+*/
 public class NbaData extends JPanel {
     private boolean DEBUG = true;
     private JTable table;
-    private JTextField filterText;
-    private JTextField statusText;
+    private JTextField yearText;
+    private JTextField playerText;
+    private JTextField teamText;
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
+    
 
     public NbaData() {
         super();
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        // setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
+        
 
         makeConnection();
         
         ResultSet result = null;
         DefaultTableModel model = null;
         Statement s = null;
+        
         
         try {
             s = conn.createStatement();
@@ -38,66 +53,102 @@ public class NbaData extends JPanel {
         sorter = new TableRowSorter<DefaultTableModel>(model);
         table = new JTable(model);
         table.setRowSorter(sorter);
-        table.setPreferredScrollableViewportSize(new Dimension(500, 70));
+        Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        System.out.println(screen.width);
+        table.setPreferredScrollableViewportSize(new Dimension(screen.width-20, screen.height/2));
         table.setFillsViewportHeight(true);
 
         //For the purposes of this example, better to have a single
         //selection.
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        //When selection changes, provide user with row numbers for
-        //both view and model.
-        table.getSelectionModel().addListSelectionListener(
-            new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent event) {
-                    int viewRow = table.getSelectedRow();
-                    if (viewRow < 0) {
-                        //Selection got filtered away.
-                        statusText.setText("");
-                    } else {
-                        int modelRow = table.convertRowIndexToModel(viewRow);
-                        statusText.setText(
-                            String.format("Selected Row in view: %d. " +
-                                "Selected Row in model: %d.", 
-                                viewRow, modelRow));
-                    }
+        JPanel scroll = new JPanel(new BorderLayout());
+        scroll.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        JPanel leftText = new JPanel();
+        
+        leftText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel centerText = new JPanel();
+        
+        centerText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel rightText = new JPanel();
+        
+        rightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JScrollPane scrollPane = new JScrollPane(table);
+        scroll.add(scrollPane);
+        JPanel textFields = new JPanel(new BorderLayout());
+        textFields.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        // JPanel footerPanel = new JPanel();
+
+        add(scroll, BorderLayout.NORTH);
+        add(textFields, BorderLayout.WEST);
+        // add(footerPanel, BorderLayout.SOUTH);
+
+        
+        // footerPanel.setPreferredSize(new Dimension(screen.width-20, 300));
+        
+        
+        JLabel l1 = new JLabel("Player", JLabel.CENTER);
+        JLabel l2 = new JLabel("Team", JLabel.CENTER);
+        JLabel l3 = new JLabel("Year", JLabel.CENTER);
+        
+        playerText = new JTextField(10);
+        teamText = new JTextField(10);
+        yearText = new JTextField(10);
+        
+        leftText.add(l1, BorderLayout.NORTH);
+        leftText.add(playerText, BorderLayout.CENTER);
+
+        centerText.add(l2, BorderLayout.NORTH);
+        centerText.add(teamText, BorderLayout.CENTER);
+
+        rightText.add(l3, BorderLayout.NORTH);
+        rightText.add(yearText, BorderLayout.CENTER);
+
+        textFields.add(leftText, BorderLayout.WEST);
+        textFields.add(centerText, BorderLayout.CENTER);
+        textFields.add(rightText, BorderLayout.EAST);
+
+        playerText.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    newFilter();
                 }
             }
         );
 
-        //Create the scroll pane and add the table to it.
-        JScrollPane scrollPane = new JScrollPane(table);
+        teamText.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+            }
+        );
 
-        //Add the scroll pane to this panel.
-        add(scrollPane);
-
-        //Create a separate form for filterText and statusText
-        JPanel form = new JPanel(new SpringLayout());
-        JLabel l1 = new JLabel("Filter Text:", SwingConstants.TRAILING);
-        form.add(l1);
-        filterText = new JTextField();
-        //Whenever filterText changes, invoke newFilter.
-        filterText.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                    public void insertUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                    public void removeUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                });
-        l1.setLabelFor(filterText);
-        form.add(filterText);
-        JLabel l2 = new JLabel("Status:", SwingConstants.TRAILING);
-        form.add(l2);
-        statusText = new JTextField();
-        l2.setLabelFor(statusText);
-        form.add(statusText);
-        SpringUtilities.makeCompactGrid(form, 2, 2, 6, 6, 6, 6);
-        add(form);
+        yearText.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    newFilter();
+                }
+            }
+        );
     }
 
     /** 
@@ -106,12 +157,17 @@ public class NbaData extends JPanel {
      */
     private void newFilter() {
         RowFilter<DefaultTableModel, Object> rf = null;
+        List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>(2);
+
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter(filterText.getText(), 0);
+            filters.add(RowFilter.regexFilter(playerText.getText(), 0));
+            filters.add(RowFilter.regexFilter(teamText.getText(), 3));
+            filters.add(RowFilter.regexFilter(yearText.getText(), 23));
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
+        rf = RowFilter.andFilter(filters);
         sorter.setRowFilter(rf);
     }
 
