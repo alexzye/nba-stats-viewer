@@ -211,7 +211,7 @@ public class NbaData extends JPanel {
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //Create and set up the content pane.
         NbaData newContentPane = new NbaData();
-        newContentPane.setOpaque(true); //content panes must be opaque
+        // newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
         //Display the window.
@@ -226,6 +226,7 @@ public class NbaData extends JPanel {
         }
         catch (ClassNotFoundException ex) {
             System.out.println("Driver not found");
+            System.exit(1);
         };
         
         String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/";
@@ -239,6 +240,7 @@ public class NbaData extends JPanel {
         }
         catch (Exception ex) {
             System.out.println("Could not open connection");
+            System.exit(1);
         };
     }
 
