@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
+import java.awt.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -34,6 +35,7 @@ public class NbaData extends JPanel {
     private JTextField addTeamText;
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
+    private DefaultTableModel model;
 
     public NbaData() {
         super();
@@ -42,7 +44,7 @@ public class NbaData extends JPanel {
         makeConnection();
         
         ResultSet result = null;
-        DefaultTableModel model = null;
+        
         Statement s = null;
         
         try {
@@ -58,7 +60,7 @@ public class NbaData extends JPanel {
         table = new JTable(model);
         table.setRowSorter(sorter);
         Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        System.out.println(screen.width);
+
         table.setPreferredScrollableViewportSize(new Dimension(screen.width-20, screen.height/2));
         table.setFillsViewportHeight(true);
 
@@ -82,6 +84,36 @@ public class NbaData extends JPanel {
         addCenterText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel addRightText = new JPanel();
         addRightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JButton addButton = new JButton("ADD");
+
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {    
+                try{
+                    Statement sa = conn.createStatement();
+                    String query = "INSERT INTO Players(Player, Team, Year) VALUES('"
+                        + addPlayerText.getText() + "','"
+                        + addTeamText.getText() + "',"
+                        + addYearText.getText() + ");";
+                    System.out.println(query);
+                    sa.executeQuery(query);
+                    Vector<String> row = new Vector<String>();
+                    row.add(addPlayerText.getText());
+                    row.add("");
+                    row.add("");
+                    row.add(addTeamText.getText());
+                    row.add(addYearText.getText());
+                    for(int i = 0; i < 18; i++) {
+                        row.add("");
+                    }
+                    model.addRow(row);
+                } catch(Exception a) {
+                    System.out.println("error");
+                }
+                
+            }
+                          
+        });
 
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -115,8 +147,6 @@ public class NbaData extends JPanel {
         
         label.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
         plabel.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
-
-
 
         addPlayerText = new JTextField(10);
         addTeamText = new JTextField(10);
@@ -152,9 +182,13 @@ public class NbaData extends JPanel {
         addPlayer.add(plabel, BorderLayout.NORTH);
         addPlayer.add(addLeftText, BorderLayout.WEST);
         addPlayer.add(addCenterText, BorderLayout.CENTER);
-        addPlayer.add(addRightText, BorderLayout.EAST);
 
+        JPanel ok = new JPanel(new BorderLayout());
+        ok.add(addRightText, BorderLayout.WEST);
+        ok.add(addButton, BorderLayout.EAST);
 
+        addPlayer.add(ok, BorderLayout.EAST);
+    
         searchAdd.add(textFields, BorderLayout.WEST);
         searchAdd.add(addPlayer, BorderLayout.EAST);
 
@@ -218,6 +252,7 @@ public class NbaData extends JPanel {
         public void keyTyped(KeyEvent e) {}
 
     }
+
 
 
     /** 
