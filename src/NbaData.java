@@ -35,6 +35,7 @@ public class NbaData extends JPanel {
     private JTextField addTeamText;
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
+    private Statement s;
     private DefaultTableModel model;
 
     public NbaData() {
@@ -45,7 +46,7 @@ public class NbaData extends JPanel {
         
         ResultSet result = null;
         
-        Statement s = null;
+        
         
         try {
             s = conn.createStatement();
@@ -89,32 +90,30 @@ public class NbaData extends JPanel {
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {    
-                try{
-                    Statement sa = conn.createStatement();
+                try {
+                    s = conn.createStatement();
                     String query = "INSERT INTO Players(Player, Team, Year) VALUES('"
                         + addPlayerText.getText() + "','"
                         + addTeamText.getText() + "',"
                         + addYearText.getText() + ");";
                     System.out.println(query);
-                    sa.executeQuery(query);
+                    s.executeUpdate(query);
+                    
                     Vector<String> row = new Vector<String>();
                     row.add(addPlayerText.getText());
                     row.add("");
-                    row.add("");
+                    row.add("0");
                     row.add(addTeamText.getText());
-                    row.add(addYearText.getText());
-                    for(int i = 0; i < 18; i++) {
-                        row.add("");
+                    for(int i = 0; i < 19; i++) {
+                        row.add("0");
                     }
+                    row.add(addYearText.getText());
                     model.addRow(row);
-                } catch(Exception a) {
-                    System.out.println("error");
+                } catch(SQLException a) {
+                    a.printStackTrace();
                 }
-                
             }
-                          
         });
-
 
         JScrollPane scrollPane = new JScrollPane(table);
         scroll.add(scrollPane);
@@ -135,13 +134,13 @@ public class NbaData extends JPanel {
         // add(textFields, BorderLayout.WEST);
 
         JLabel label = new JLabel("Search by player name, team name, year, or all 3! Case sensitive. Example: Name: Stephen Curry, Team: GSW, Year: 2015");
-        JLabel l1 = new JLabel("Player", JLabel.CENTER);
+        JLabel l1 = new JLabel("Name", JLabel.CENTER);
         JLabel l2 = new JLabel("Team", JLabel.CENTER);
         JLabel l3 = new JLabel("Year", JLabel.CENTER);
 
 
-        JLabel plabel = new JLabel("Enter Player, Team, Year to add a player");
-        JLabel pl1 = new JLabel("Player", JLabel.CENTER);
+        JLabel plabel = new JLabel("Enter a Name, Team, and Year to add a player to the database");
+        JLabel pl1 = new JLabel("Name", JLabel.CENTER);
         JLabel pl2 = new JLabel("Team", JLabel.CENTER);
         JLabel pl3 = new JLabel("Year", JLabel.CENTER);        
         
