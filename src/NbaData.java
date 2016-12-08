@@ -36,7 +36,7 @@ public class NbaData extends JPanel {
     private Statement s;
     private DefaultTableModel model;
     private String query;
-    private String[] cols = {"Player", "Pos", "Age", "Team", "GP", "GS", "MIN", "FGM", "3PM", "3PA", "2PM", "2PA", "FTM", "ORB", "DRB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "Year"};
+    private String[] cols = {"Player", "Pos", "Age", "Team", "GP", "GS", "MIN", "FGM", "FGA", "3PM", "3PA", "2PM", "2PA", "FTM", "FTA", "ORB", "DRB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "Year"};
 
     public NbaData() {
         super();
@@ -275,6 +275,9 @@ public class NbaData extends JPanel {
                     JOptionPane.showMessageDialog(frame, "Team abbrev must be a 3 character string");
                     return;
                 }
+                addYearText.setText("");
+                addTeamText.setText("");
+                addPlayerText.setText("");
             }
         });
 
@@ -292,20 +295,23 @@ public class NbaData extends JPanel {
                 System.out.println(pYear);
                 
                 try {
-                    if(colnum != 0 && colnum != 1 && colnum != 3) {
-                        query = "UPDATE Players SET " + cols[colnum] + "=" + 
-                        table.getModel().getValueAt(row, colnum) + 
-                        " WHERE Player='" + pName + "' AND Team='" + 
-                        pTeam + "' AND Year=" + pYear;
-                        s.executeUpdate(query);
-                    } else {
-                        query = "UPDATE Players SET " + cols[colnum] + "='" + 
-                        table.getModel().getValueAt(row, colnum) + 
-                        "' WHERE Player='" + pName + "' AND Team='" + 
-                        pTeam + "' AND Year=" + pYear;
-                        s.executeUpdate(query);
+                    if(colnum >= 0) {
+                        if(colnum != 0 && colnum != 1 && colnum != 3) {
+                            query = "UPDATE Players SET " + cols[colnum] + "=" + 
+                            table.getModel().getValueAt(row, colnum) + 
+                            " WHERE Player='" + pName + "' AND Team='" + 
+                            pTeam + "' AND Year=" + pYear;
+                            s.executeUpdate(query);
+                        } else {
+                            query = "UPDATE Players SET " + cols[colnum] + "='" + 
+                            table.getModel().getValueAt(row, colnum) + 
+                            "' WHERE Player='" + pName + "' AND Team='" + 
+                            pTeam + "' AND Year=" + pYear;
+                            s.executeUpdate(query);
+                        }
+                        System.out.println(query);
                     }
-                    System.out.println(query);
+                    
                 } catch(SQLException col) {
                     col.printStackTrace();
                 }
