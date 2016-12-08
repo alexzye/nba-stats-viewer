@@ -4,9 +4,7 @@ import javax.swing.event.*;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.event.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -38,6 +36,7 @@ public class NbaData extends JPanel {
     private Statement s;
     private DefaultTableModel model;
     private String query;
+    private String[] cols = {"Player", "Pos", "Age", "Team", "GP", "GS", "MIN", "FGM", "3PM", "3PA", "2PM", "2PA", "FTM", "ORB", "DRB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "Year"};
 
     public NbaData() {
         super();
@@ -59,9 +58,7 @@ public class NbaData extends JPanel {
         } catch(SQLException ee) {
             ee.printStackTrace();
         }
-        
-        
-        
+  
         try {
             s = conn.createStatement();
             result = s.executeQuery("SELECT * FROM Players");
@@ -79,8 +76,6 @@ public class NbaData extends JPanel {
         table.setPreferredScrollableViewportSize(new Dimension(screen.width-20, screen.height/2));
         table.setFillsViewportHeight(true);
 
-        //For the purposes of this example, better to have a single
-        //selection.
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JPanel scroll = new JPanel(new BorderLayout());
@@ -102,71 +97,6 @@ public class NbaData extends JPanel {
 
         JButton addButton = new JButton("ADD");
 
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String player = addPlayerText.getText();
-                String team = addTeamText.getText();
-                String year = addYearText.getText();
-
-                if(player.length() == 0) {
-                    JOptionPane.showMessageDialog(frame, "Player name must be a valid string");
-                    return;
-                }
-
-                if(year.length() == 0) {
-                    JOptionPane.showMessageDialog(frame, "Year name must be a valid integer");
-                    return;
-                } else {
-                    try {
-                        Integer.parseInt(year);
-                    } catch(Exception e1) {
-                        JOptionPane.showMessageDialog(frame, "Year must be an integer");
-                        return;
-                    }
-                }
-                
-                if(team.length() == 3) {
-                    try {
-                        if(teams.contains(addTeamText.getText())) {
-                            System.out.println("Team is found for entry");
-                        } else {
-                            try {
-                                query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + addTeamText.getText() + "', 'User Added')";
-                                System.out.println(query);
-                                s.executeUpdate(query);
-                            } catch(SQLException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-
-                        query = "INSERT INTO Players(Player, Team, Year) VALUES('"
-                            + player + "','"
-                            + team + "',"
-                            + year + ");";
-                        System.out.println(query);
-                        s.executeUpdate(query);
-                        
-                        Vector<String> row = new Vector<String>();
-                        row.add(player);
-                        row.add("");
-                        row.add("0");
-                        row.add(team);
-                        for(int i = 0; i < 19; i++) {
-                            row.add("0");
-                        }
-                        row.add(year);
-                        model.addRow(row);
-                    } catch(SQLException a) {
-                        a.printStackTrace();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Team abbrev must be a 3 character string");
-                }
-
-            }
-                
-        });
-
         JScrollPane scrollPane = new JScrollPane(table);
         scroll.add(scrollPane);
 
@@ -185,7 +115,6 @@ public class NbaData extends JPanel {
         JLabel l1 = new JLabel("Name", JLabel.CENTER);
         JLabel l2 = new JLabel("Team", JLabel.CENTER);
         JLabel l3 = new JLabel("Year", JLabel.CENTER);
-
 
         JLabel plabel = new JLabel("Enter a Name, Team, and Year to add a player to the database");
         JLabel pl1 = new JLabel("Name", JLabel.CENTER);
@@ -284,6 +213,105 @@ public class NbaData extends JPanel {
                 }
             }
         );
+
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String player = addPlayerText.getText();
+                String team = addTeamText.getText();
+                String year = addYearText.getText();
+
+                if(player.length() == 0) {
+                    JOptionPane.showMessageDialog(frame, "Player name must be a valid string");
+                    return;
+                }
+
+                if(year.length() == 0) {
+                    JOptionPane.showMessageDialog(frame, "Year name must be a valid integer");
+                    return;
+                } else {
+                    try {
+                        Integer.parseInt(year);
+                    } catch(Exception e1) {
+                        JOptionPane.showMessageDialog(frame, "Year must be a valid integer");
+                        return;
+                    }
+                }
+                
+                if(team.length() == 3) {
+                    try {
+                        if(teams.contains(team)) {
+                            System.out.println("Team is found for entry");
+                        } else {
+                            try {
+                                query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + addTeamText.getText() + "', 'User Added')";
+                                System.out.println(query);
+                                s.executeUpdate(query);
+                            } catch(SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+                        query = "INSERT INTO Players(Player, Team, Year) VALUES('"
+                            + player + "','"
+                            + team + "',"
+                            + year + ");";
+                        System.out.println(query);
+                        s.executeUpdate(query);
+                        
+                        Vector<String> row = new Vector<String>();
+                        row.add(player);
+                        row.add("");
+                        row.add("0");
+                        row.add(team);
+                        for(int i = 0; i < 19; i++) {
+                            row.add("0");
+                        }
+                        row.add(year);
+                        model.addRow(row);
+                    } catch(SQLException a) {
+                        a.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Team abbrev must be a 3 character string");
+                    return;
+                }
+            }
+        });
+
+        table.getModel().addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent evt) 
+            {
+                int colnum = evt.getColumn();
+                int row = evt.getFirstRow();
+
+                String pName = (String)table.getModel().getValueAt(row, 0);
+                String pYear = String.valueOf(table.getModel().getValueAt(row, 23));
+                String pTeam = (String)table.getModel().getValueAt(row, 3);
+                System.out.println(pName);
+                System.out.println(pTeam);
+                System.out.println(pYear);
+                
+                try {
+                    if(colnum != 0 && colnum != 1 && colnum != 3) {
+                        query = "UPDATE Players SET " + cols[colnum] + "=" + 
+                        table.getModel().getValueAt(row, colnum) + 
+                        " WHERE Player='" + pName + "' AND Team='" + 
+                        pTeam + "' AND Year=" + pYear;
+                        s.executeUpdate(query);
+                    } else {
+                        query = "UPDATE Players SET " + cols[colnum] + "='" + 
+                        table.getModel().getValueAt(row, colnum) + 
+                        "' WHERE Player='" + pName + "' AND Team='" + 
+                        pTeam + "' AND Year=" + pYear;
+                        s.executeUpdate(query);
+                    }
+                    System.out.println(query);
+                } catch(SQLException col) {
+                    col.printStackTrace();
+                }
+                
+            }
+        });
     }
 
     class MyKeyListener implements KeyListener {
@@ -297,10 +325,7 @@ public class NbaData extends JPanel {
         }
         public void keyReleased(KeyEvent e) {}
         public void keyTyped(KeyEvent e) {}
-
     }
-
-
 
     /** 
      * Update the row filter regular expression from the expression in
@@ -366,10 +391,8 @@ public class NbaData extends JPanel {
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //Create and set up the content pane.
         NbaData newContentPane = new NbaData();
-        // newContentPane.setOpaque(true); //content panes must be opaque
+        newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
-
-
         //Display the window.
         frame.pack();
         frame.setVisible(true);
