@@ -1,6 +1,8 @@
 import java.sql.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.Color;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -9,6 +11,7 @@ import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.util.*;
+import java.awt.event.KeyListener;
 
 /*
    GUI Interface for the NBA Data Viewer
@@ -24,9 +27,13 @@ public class NbaData extends JPanel {
     private JTextField yearText;
     private JTextField playerText;
     private JTextField teamText;
+    private static JFrame frame;
+
+    private JTextField addYearText;
+    private JTextField addPlayerText;
+    private JTextField addTeamText;
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
-    
 
     public NbaData() {
         super();
@@ -61,35 +68,64 @@ public class NbaData extends JPanel {
 
         JPanel scroll = new JPanel(new BorderLayout());
         scroll.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        JPanel leftText = new JPanel();
         
+        JPanel leftText = new JPanel();
         leftText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel centerText = new JPanel();
-        
         centerText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel rightText = new JPanel();
-        
         rightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel addLeftText = new JPanel();
+        addLeftText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 100));
+        JPanel addCenterText = new JPanel();
+        addCenterText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel addRightText = new JPanel();
+        addRightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+
         JScrollPane scrollPane = new JScrollPane(table);
         scroll.add(scrollPane);
+
         JPanel textFields = new JPanel(new BorderLayout());
         textFields.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        
+
+        JPanel addPlayer = new JPanel(new BorderLayout());
+        addPlayer.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+
+        JPanel searchAdd = new JPanel();
 
         add(scroll, BorderLayout.NORTH);
-        add(textFields, BorderLayout.WEST);
-        
-        
+        add(searchAdd, BorderLayout.CENTER);
+
+
+        // add(textFields, BorderLayout.WEST);
+
+        JLabel label = new JLabel("Search by player name, team name, year, or all 3! Case sensitive. Example: Name: Stephen Curry, Team: GSW, Year: 2015");
         JLabel l1 = new JLabel("Player", JLabel.CENTER);
         JLabel l2 = new JLabel("Team", JLabel.CENTER);
         JLabel l3 = new JLabel("Year", JLabel.CENTER);
-        JLabel label = new JLabel("Search for according to Player, Team, Year or all 3! Case sensitive. \nExample: Name: Stephen Curry, Team: GSW, Year: 2015");
+
+
+        JLabel plabel = new JLabel("Enter Player, Team, Year to add a player");
+        JLabel pl1 = new JLabel("Player", JLabel.CENTER);
+        JLabel pl2 = new JLabel("Team", JLabel.CENTER);
+        JLabel pl3 = new JLabel("Year", JLabel.CENTER);        
+        
         label.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
+        plabel.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
+
+
+
+        addPlayerText = new JTextField(10);
+        addTeamText = new JTextField(10);
+        addYearText = new JTextField(10);
 
         playerText = new JTextField(10);
         teamText = new JTextField(10);
         yearText = new JTextField(10);
-        
+
         leftText.add(l1, BorderLayout.NORTH);
         leftText.add(playerText, BorderLayout.CENTER);
 
@@ -99,10 +135,32 @@ public class NbaData extends JPanel {
         rightText.add(l3, BorderLayout.NORTH);
         rightText.add(yearText, BorderLayout.CENTER);
 
+        addLeftText.add(pl1, BorderLayout.NORTH);
+        addLeftText.add(addPlayerText, BorderLayout.CENTER);
+
+        addCenterText.add(pl2, BorderLayout.NORTH);
+        addCenterText.add(addTeamText, BorderLayout.CENTER);
+
+        addRightText.add(pl3, BorderLayout.NORTH);
+        addRightText.add(addYearText, BorderLayout.CENTER);
+
         textFields.add(label, BorderLayout.NORTH);
         textFields.add(leftText, BorderLayout.WEST);
         textFields.add(centerText, BorderLayout.CENTER);
         textFields.add(rightText, BorderLayout.EAST);
+        
+        addPlayer.add(plabel, BorderLayout.NORTH);
+        addPlayer.add(addLeftText, BorderLayout.WEST);
+        addPlayer.add(addCenterText, BorderLayout.CENTER);
+        addPlayer.add(addRightText, BorderLayout.EAST);
+
+
+        searchAdd.add(textFields, BorderLayout.WEST);
+        searchAdd.add(addPlayer, BorderLayout.EAST);
+
+        addPlayer.setBorder(BorderFactory.createLineBorder(Color.black));
+        textFields.setBorder(BorderFactory.createLineBorder(Color.black));
+
 
         playerText.getDocument().addDocumentListener(
             new DocumentListener() {
@@ -146,6 +204,21 @@ public class NbaData extends JPanel {
             }
         );
     }
+
+    class MyKeyListener implements KeyListener {
+    // override all the methods of KeyListener interface.
+        public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
+
+            if (key == KeyEvent.VK_ENTER) {
+                System.out.println("enter pressed");
+            }
+        }
+        public void keyReleased(KeyEvent e) {}
+        public void keyTyped(KeyEvent e) {}
+
+    }
+
 
     /** 
      * Update the row filter regular expression from the expression in
@@ -206,13 +279,14 @@ public class NbaData extends JPanel {
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("NBA Data Viewer");
+         frame = new JFrame("NBA Data Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //Create and set up the content pane.
         NbaData newContentPane = new NbaData();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
+
 
         //Display the window.
         frame.pack();
