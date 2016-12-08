@@ -37,6 +37,7 @@ public class NbaData extends JPanel {
     private static Connection conn;
     private Statement s;
     private DefaultTableModel model;
+    private String query;
 
     public NbaData() {
         super();
@@ -45,6 +46,19 @@ public class NbaData extends JPanel {
         makeConnection();
         
         ResultSet result = null;
+        query = "SELECT Abbrev FROM Teams";
+        ArrayList<String> teams = new ArrayList<>();
+
+        try {
+            s = conn.createStatement();
+            ResultSet r = s.executeQuery(query);
+
+            while (r.next()) {
+               teams.add((String)r.getObject(1));
+            }    
+        } catch(SQLException ee) {
+            ee.printStackTrace();
+        }
         
         
         
@@ -89,30 +103,44 @@ public class NbaData extends JPanel {
         JButton addButton = new JButton("ADD");
 
         addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {    
-                try {
-                    s = conn.createStatement();
-                    String query = "INSERT INTO Players(Player, Team, Year) VALUES('"
-                        + addPlayerText.getText() + "','"
-                        + addTeamText.getText() + "',"
-                        + addYearText.getText() + ");";
-                    System.out.println(query);
-                    s.executeUpdate(query);
-                    
-                    Vector<String> row = new Vector<String>();
-                    row.add(addPlayerText.getText());
-                    row.add("");
-                    row.add("0");
-                    row.add(addTeamText.getText());
-                    for(int i = 0; i < 19; i++) {
+            public void actionPerformed(ActionEvent e) {
+                if(addTeamText.getText().length() == 3) {
+                    try {
+                        if(teams.contains(addTeamText.getText())) {
+                            System.out.println("Team is found for entry");
+                        } else {
+                            try {
+                                query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + addTeamText.getText() + "', 'User Added')";
+                                System.out.println(query);
+                                s.executeUpdate(query);
+                            } catch(SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+                        query = "INSERT INTO Players(Player, Team, Year) VALUES('"
+                            + addPlayerText.getText() + "','"
+                            + addTeamText.getText() + "',"
+                            + addYearText.getText() + ");";
+                        System.out.println(query);
+                        s.executeUpdate(query);
+                        
+                        Vector<String> row = new Vector<String>();
+                        row.add(addPlayerText.getText());
+                        row.add("");
                         row.add("0");
+                        row.add(addTeamText.getText());
+                        for(int i = 0; i < 19; i++) {
+                            row.add("0");
+                        }
+                        row.add(addYearText.getText());
+                        model.addRow(row);
+                    } catch(SQLException a) {
+                        a.printStackTrace();
                     }
-                    row.add(addYearText.getText());
-                    model.addRow(row);
-                } catch(SQLException a) {
-                    a.printStackTrace();
                 }
             }
+                
         });
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -124,14 +152,10 @@ public class NbaData extends JPanel {
         JPanel addPlayer = new JPanel(new BorderLayout());
         addPlayer.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-
         JPanel searchAdd = new JPanel();
 
         add(scroll, BorderLayout.NORTH);
         add(searchAdd, BorderLayout.CENTER);
-
-
-        // add(textFields, BorderLayout.WEST);
 
         JLabel label = new JLabel("Search by player name, team name, year, or all 3! Case sensitive. Example: Name: Stephen Curry, Team: GSW, Year: 2015");
         JLabel l1 = new JLabel("Name", JLabel.CENTER);
