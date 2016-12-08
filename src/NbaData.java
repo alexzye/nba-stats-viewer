@@ -27,7 +27,6 @@ public class NbaData extends JPanel {
     private JTextField playerText;
     private JTextField teamText;
     private static JFrame frame;
-
     private JTextField addYearText;
     private JTextField addPlayerText;
     private JTextField addTeamText;
@@ -35,8 +34,14 @@ public class NbaData extends JPanel {
     private static Connection conn;
     private Statement s;
     private DefaultTableModel model;
+    private ArrayList<String> teams;
     private String query;
-    private String[] cols = {"Player", "Pos", "Age", "Team", "GP", "GS", "MIN", "FGM", "FGA", "3PM", "3PA", "2PM", "2PA", "FTM", "FTA", "ORB", "DRB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "Year"};
+    private String[] cols = {
+        "Player", "Pos", "Age", "Team", "GP", "GS", 
+        "MIN", "FGM", "FGA", "3PM", "3PA", "2PM", 
+        "2PA", "FTM", "FTA", "ORB", "DRB", "AST", 
+        "STL", "BLK", "TOV", "PF", "PTS", "Year"
+    };
 
     public NbaData() {
         super();
@@ -46,7 +51,7 @@ public class NbaData extends JPanel {
         
         ResultSet result = null;
         query = "SELECT Abbrev FROM Teams";
-        ArrayList<String> teams = new ArrayList<>();
+        teams = new ArrayList<>();
 
         try {
             s = conn.createStatement();
@@ -119,7 +124,7 @@ public class NbaData extends JPanel {
         JLabel plabel = new JLabel("Enter a Name, Team, and Year to add a player to the database");
         JLabel pl1 = new JLabel("Name", JLabel.CENTER);
         JLabel pl2 = new JLabel("Team", JLabel.CENTER);
-        JLabel pl3 = new JLabel("Year", JLabel.CENTER);        
+        JLabel pl3 = new JLabel("Year", JLabel.CENTER);
         
         label.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
         plabel.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 10));
@@ -246,6 +251,19 @@ public class NbaData extends JPanel {
                                 query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + addTeamText.getText() + "', 'User Added')";
                                 System.out.println(query);
                                 s.executeUpdate(query);
+                                query = "SELECT Abbrev FROM Teams";
+                                teams = new ArrayList<>();
+
+                                try {
+                                    s = conn.createStatement();
+                                    ResultSet r1 = s.executeQuery(query);
+
+                                    while (r1.next()) {
+                                       teams.add((String)r1.getObject(1));
+                                    }    
+                                } catch(SQLException ee1) {
+                                    ee1.printStackTrace();
+                                }
                             } catch(SQLException ex) {
                                 ex.printStackTrace();
                             }
@@ -282,20 +300,18 @@ public class NbaData extends JPanel {
         });
 
         table.getModel().addTableModelListener(new TableModelListener() {
-            public void tableChanged(TableModelEvent evt) 
-            {
+            public void tableChanged(TableModelEvent evt) {
                 int colnum = evt.getColumn();
                 int row = evt.getFirstRow();
 
                 String pName = (String)table.getModel().getValueAt(row, 0);
                 String pYear = String.valueOf(table.getModel().getValueAt(row, 23));
                 String pTeam = (String)table.getModel().getValueAt(row, 3);
-                System.out.println(pName);
-                System.out.println(pTeam);
-                System.out.println(pYear);
                 
                 try {
                     if(colnum >= 0) {
+
+
                         if(colnum != 0 && colnum != 1 && colnum != 3) {
                             query = "UPDATE Players SET " + cols[colnum] + "=" + 
                             table.getModel().getValueAt(row, colnum) + 
@@ -303,6 +319,34 @@ public class NbaData extends JPanel {
                             pTeam + "' AND Year=" + pYear;
                             s.executeUpdate(query);
                         } else {
+                            if(colnum == 3) {
+                                if(teams.contains(pTeam)) {
+                                    System.out.println("Team is found for entry");
+                                } else {
+                                    try {
+                                        query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + pTeam + "', 'User Added')";
+                                        System.out.println(query);
+                                        s.executeUpdate(query);
+                                        
+                                        try {
+                                            query = "SELECT Abbrev FROM Teams";
+                                            s = conn.createStatement();
+                                            ResultSet r = s.executeQuery(query);
+
+                                            while (r.next()) {
+                                               teams.add((String)r.getObject(1));
+                                            }    
+                                        } catch(SQLException ee) {
+                                            ee.printStackTrace();
+                                        }
+
+                                    } catch(SQLException ex) {
+                                        JOptionPane.showMessageDialog(frame, "Please enter a 3 character team code.");
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            }
+
                             query = "UPDATE Players SET " + cols[colnum] + "='" + 
                             table.getModel().getValueAt(row, colnum) + 
                             "' WHERE Player='" + pName + "' AND Team='" + 
@@ -311,11 +355,10 @@ public class NbaData extends JPanel {
                         }
                         System.out.println(query);
                     }
-                    
                 } catch(SQLException col) {
+                    JOptionPane.showMessageDialog(frame, "Invalid update");
                     col.printStackTrace();
                 }
-                
             }
         });
     }
