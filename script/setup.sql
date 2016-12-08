@@ -1,4 +1,5 @@
+source table-setup.sql;
 source create-teams.sql;
-source create-players.sql;
+source create-players-test.sql;
 source create-mvp.sql;
-source create-champtions.sql;
+source create-champions.sql;

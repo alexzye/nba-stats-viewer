@@ -1,12 +1,3 @@
-/*
-   Populates the MVP table.
-
-   Authors:
-   Alex Ye, aye01
-   Robert Franklin Mathews IV, rfmathew
-   Esteban Ray Ramos, eramos04
-*/
-
 INSERT INTO MVP(Player,Team,Year) VALUES ('Stephen Curry','GSW',2016);
 INSERT INTO MVP(Player,Team,Year) VALUES ('Stephen Curry','GSW',2015);
 INSERT INTO MVP(Player,Team,Year) VALUES ('Kevin Durant','OKC',2014);

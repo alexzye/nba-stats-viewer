@@ -1,12 +1,3 @@
-/*
-   Populates the Teams table.
-
-   Authors:
-   Alex Ye, aye01
-   Robert Franklin Mathews IV, rfmathew
-   Esteban Ray Ramos, eramos04
-*/
-
 INSERT INTO Teams(Abbrev,Name,City,State) VALUES ('ATL','Atlanta Hawks','Atlanta','GA');
 INSERT INTO Teams(Abbrev,Name,City,State) VALUES ('BAL','Baltimore Bullets','Baltimore','MD');
 INSERT INTO Teams(Abbrev,Name,City,State) VALUES ('BOS','Boston Celtics','Boston','MA');

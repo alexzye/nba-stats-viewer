@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.util.*;
 import java.awt.event.KeyListener;
+import java.io.*;
 
 /*
    GUI Interface for the NBA Data Viewer
@@ -43,10 +44,18 @@ public class NbaData extends JPanel {
         "STL", "BLK", "TOV", "PF", "PTS", "Year"
     };
 
+    private String[] setupFiles = {
+        "../script/table-cleanup.sql",
+        "../script/table-setup.sql",
+        "../script/create-teams.sql",
+        "../script/create-players-test.sql",
+        "../script/create-mvp-test.sql",
+        "../script/create-champions.sql"
+    };
+
     public NbaData() {
         super();
-        setLayout(new BorderLayout());
-        
+        setLayout(new BorderLayout());        
         makeConnection();
         
         ResultSet result = null;
@@ -113,8 +122,11 @@ public class NbaData extends JPanel {
 
         JPanel searchAdd = new JPanel();
 
+        JButton resetButton = new JButton("RESET DATA");
+
         add(scroll, BorderLayout.NORTH);
         add(searchAdd, BorderLayout.CENTER);
+        add(resetButton, BorderLayout.SOUTH);
 
         JLabel label = new JLabel("Search by player name, team name, year, or all 3! Case sensitive. Example: Name: Stephen Curry, Team: GSW, Year: 2015");
         JLabel l1 = new JLabel("Name", JLabel.CENTER);
@@ -219,6 +231,83 @@ public class NbaData extends JPanel {
             }
         );
 
+        resetButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                resetDatabases();
+
+                ResultSet res = null;
+                try {
+                    res = s.executeQuery("SELECT * FROM Players");
+                } catch (SQLException eql) {};
+                
+                try {
+                    model = buildTableModel(res);    
+                } catch(SQLException eql) {}
+                table = new JTable(model);
+
+                scrollPane.setViewportView(table);
+                table.getModel().addTableModelListener(new TableModelListener() {
+                    public void tableChanged(TableModelEvent evt) {
+                        int colnum = evt.getColumn();
+                        int row = evt.getFirstRow();
+
+                        String pName = (String)table.getModel().getValueAt(row, 0);
+                        String pYear = String.valueOf(table.getModel().getValueAt(row, 23));
+                        String pTeam = (String)table.getModel().getValueAt(row, 3);
+                        
+                        try {
+                            if(colnum >= 0) {
+                                if(colnum != 0 && colnum != 1 && colnum != 3) {
+                                    query = "UPDATE Players SET " + cols[colnum] + "=" + 
+                                    table.getModel().getValueAt(row, colnum) + 
+                                    " WHERE Player='" + pName + "' AND Team='" + 
+                                    pTeam + "' AND Year=" + pYear;
+                                    s.executeUpdate(query);
+                                } else {
+                                    if(colnum == 3) {
+                                        if(teams.contains(pTeam)) {
+                                            System.out.println("Team is found for entry");
+                                        } else {
+                                            try {
+                                                query = "INSERT INTO Teams(Abbrev, Name) VALUES('" + pTeam + "', 'User Added')";
+                                                System.out.println(query);
+                                                s.executeUpdate(query);
+                                                
+                                                try {
+                                                    query = "SELECT Abbrev FROM Teams";
+                                                    s = conn.createStatement();
+                                                    ResultSet r = s.executeQuery(query);
+
+                                                    while (r.next()) {
+                                                       teams.add((String)r.getObject(1));
+                                                    }    
+                                                } catch(SQLException ee) {
+                                                    ee.printStackTrace();
+                                                }
+                                            } catch(SQLException ex) {
+                                                JOptionPane.showMessageDialog(frame, "Please enter a 3 character team code.");
+                                                ex.printStackTrace();
+                                            }
+                                        }
+                                    }
+
+                                    query = "UPDATE Players SET " + cols[colnum] + "='" + 
+                                    table.getModel().getValueAt(row, colnum) + 
+                                    "' WHERE Player='" + pName + "' AND Team='" + 
+                                    pTeam + "' AND Year=" + pYear;
+                                    s.executeUpdate(query);
+                                }
+                                System.out.println(query);
+                            }
+                        } catch(SQLException col) {
+                            JOptionPane.showMessageDialog(frame, "Invalid update");
+                            col.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String player = addPlayerText.getText();
@@ -310,8 +399,6 @@ public class NbaData extends JPanel {
                 
                 try {
                     if(colnum >= 0) {
-
-
                         if(colnum != 0 && colnum != 1 && colnum != 3) {
                             query = "UPDATE Players SET " + cols[colnum] + "=" + 
                             table.getModel().getValueAt(row, colnum) + 
@@ -339,7 +426,6 @@ public class NbaData extends JPanel {
                                         } catch(SQLException ee) {
                                             ee.printStackTrace();
                                         }
-
                                     } catch(SQLException ex) {
                                         JOptionPane.showMessageDialog(frame, "Please enter a 3 character team code.");
                                         ex.printStackTrace();
@@ -363,17 +449,25 @@ public class NbaData extends JPanel {
         });
     }
 
-    class MyKeyListener implements KeyListener {
-    // override all the methods of KeyListener interface.
-        public void keyPressed(KeyEvent e) {
-            int key = e.getKeyCode();
-
-            if (key == KeyEvent.VK_ENTER) {
-                System.out.println("enter pressed");
+    private void resetDatabases() {
+        for(String file : setupFiles) {
+            String content = null;
+            try {
+                content = new Scanner(new File(file)).useDelimiter("\\Z").next();
+            } catch(FileNotFoundException fnf) {
+                System.out.println("Database loading scripts not found: " + file);
+            }
+            System.out.println(content);
+            if(content != null) {
+                for(String q : content.split(";\n")) {
+                    try {
+                        s.executeUpdate(q);    
+                    } catch(SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+                }
             }
         }
-        public void keyReleased(KeyEvent e) {}
-        public void keyTyped(KeyEvent e) {}
     }
 
     /** 
