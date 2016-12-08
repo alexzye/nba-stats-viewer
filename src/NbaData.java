@@ -104,7 +104,28 @@ public class NbaData extends JPanel {
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(addTeamText.getText().length() == 3) {
+                String player = addPlayerText.getText();
+                String team = addTeamText.getText();
+                String year = addYearText.getText();
+
+                if(player.length() == 0) {
+                    JOptionPane.showMessageDialog(frame, "Player name must be a valid string");
+                    return;
+                }
+
+                if(year.length() == 0) {
+                    JOptionPane.showMessageDialog(frame, "Year name must be a valid integer");
+                    return;
+                } else {
+                    try {
+                        Integer.parseInt(year);
+                    } catch(Exception e1) {
+                        JOptionPane.showMessageDialog(frame, "Year must be an integer");
+                        return;
+                    }
+                }
+                
+                if(team.length() == 3) {
                     try {
                         if(teams.contains(addTeamText.getText())) {
                             System.out.println("Team is found for entry");
@@ -119,26 +140,29 @@ public class NbaData extends JPanel {
                         }
 
                         query = "INSERT INTO Players(Player, Team, Year) VALUES('"
-                            + addPlayerText.getText() + "','"
-                            + addTeamText.getText() + "',"
-                            + addYearText.getText() + ");";
+                            + player + "','"
+                            + team + "',"
+                            + year + ");";
                         System.out.println(query);
                         s.executeUpdate(query);
                         
                         Vector<String> row = new Vector<String>();
-                        row.add(addPlayerText.getText());
+                        row.add(player);
                         row.add("");
                         row.add("0");
-                        row.add(addTeamText.getText());
+                        row.add(team);
                         for(int i = 0; i < 19; i++) {
                             row.add("0");
                         }
-                        row.add(addYearText.getText());
+                        row.add(year);
                         model.addRow(row);
                     } catch(SQLException a) {
                         a.printStackTrace();
                     }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Team abbrev must be a 3 character string");
                 }
+
             }
                 
         });
