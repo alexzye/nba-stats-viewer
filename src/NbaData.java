@@ -688,13 +688,12 @@ public class NbaData extends JPanel {
         // String db = "nba";
         // String password="password";
 
-        String url = "jdbc:mysql://cslvm74.csc.calpoly.edu";
+        String url = "jdbc:mysql@cslvm74.csc.calpoly.edu/nba";
         String user ="aye01";
-        String db = "aye01";
         String password="4207731";
 
         try {
-            conn = DriverManager.getConnection(url + db, user, password);
+            conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connection made");
         }
         catch (Exception ex) {
