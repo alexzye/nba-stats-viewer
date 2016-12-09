@@ -1,5 +1,5 @@
 [mysql]
-host=nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com
-user=admin
-database=nba
-password=password
+host=cslvm74.csc.calpoly.edu
+user=aye01
+database=aye01
+password=4207731
