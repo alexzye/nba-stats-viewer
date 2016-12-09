@@ -39,6 +39,7 @@ public class NbaData extends JPanel {
     private JLabel stat4result;
     private JLabel stat5result;
     private JLabel stat6result;
+    private JScrollPane scrollPane;
 
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
@@ -191,7 +192,7 @@ public class NbaData extends JPanel {
         stats.add(statright, BorderLayout.EAST);
         stats.add(statcenter, BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane = new JScrollPane(table);
         scroll.add(scrollPane);
 
         JPanel textFields = new JPanel(new BorderLayout());
