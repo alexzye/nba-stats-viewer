@@ -330,7 +330,15 @@ public class NbaData extends JPanel {
                 try {
                     model = buildTableModel(res);    
                 } catch(SQLException eql) {}
+                sorter = new TableRowSorter<DefaultTableModel>(model);
                 table = new JTable(model);
+                table.setRowSorter(sorter);
+                Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+
+                table.setPreferredScrollableViewportSize(new Dimension(screen.width-20, screen.height/2));
+                table.setFillsViewportHeight(true);
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
                 scrollPane.setViewportView(table);
                 table.getModel().addTableModelListener(new TableModelListener() {
