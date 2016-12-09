@@ -683,10 +683,15 @@ public class NbaData extends JPanel {
             System.exit(1);
         };
         
-        String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/";
-        String user ="admin";
-        String db = "nba";
-        String password="password";
+        // String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/";
+        // String user ="admin";
+        // String db = "nba";
+        // String password="password";
+
+        String url = "jdbc:mysql://cslvm74.csc.calpoly.edu";
+        String user ="aye01";
+        String db = "aye01";
+        String password="4207731";
 
         try {
             conn = DriverManager.getConnection(url + db, user, password);
