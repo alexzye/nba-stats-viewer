@@ -348,7 +348,7 @@ public class NbaData extends JPanel {
                                     query = "UPDATE Players SET " + cols[colnum] + "=" + 
                                     table.getModel().getValueAt(row, colnum) + 
                                     " WHERE Player='" + pName + "' AND Team='" + 
-                                    pTeam + "' AND Year=" + pYear;
+                                    pTeam + "' AND Year=" + pYear + ";";
                                     s.executeUpdate(query);
                                 } else {
                                     if(colnum == 3) {
