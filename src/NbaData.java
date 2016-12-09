@@ -31,6 +31,15 @@ public class NbaData extends JPanel {
     private JTextField addYearText;
     private JTextField addPlayerText;
     private JTextField addTeamText;
+    private JPanel srpanel;
+    private JPanel stats;
+    private JLabel stat1result;
+    private JLabel stat2result;
+    private JLabel stat3result;
+    private JLabel stat4result;
+    private JLabel stat5result;
+    private JLabel stat6result;
+
     private TableRowSorter<DefaultTableModel> sorter;
     private static Connection conn;
     private Statement s;
@@ -103,13 +112,84 @@ public class NbaData extends JPanel {
         rightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel addLeftText = new JPanel();
-        addLeftText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 100));
+        addLeftText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel addCenterText = new JPanel();
         addCenterText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel addRightText = new JPanel();
         addRightText.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        JPanel statleft = new JPanel();
+
+        JPanel stat1 = new JPanel(new BorderLayout());
+        stat1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel stat2 = new JPanel(new BorderLayout());
+        stat2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel stat1header = new JLabel("Most total points:");
+        stat1result = new JLabel("");
+        stat1.add(stat1header, BorderLayout.NORTH);
+        stat1.add(stat1result, BorderLayout.SOUTH);
+
+        JLabel stat2header = new JLabel("2Most total points:");
+        stat2result = new JLabel("");
+        stat2.add(stat2header, BorderLayout.NORTH);
+        stat2.add(stat2result, BorderLayout.SOUTH);
+
+        statleft.add(stat1, BorderLayout.WEST);
+        statleft.add(stat2, BorderLayout.EAST);
+        
+        JPanel statright = new JPanel();
+
+        JPanel stat3 = new JPanel(new BorderLayout());
+        stat3.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel stat4 = new JPanel(new BorderLayout());
+        stat4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel stat3header = new JLabel("Most total points:");
+        stat3result = new JLabel("");
+        stat3.add(stat3header, BorderLayout.NORTH);
+        stat3.add(stat3result, BorderLayout.SOUTH);
+
+        JLabel stat4header = new JLabel("2Most total points:");
+        stat4result = new JLabel("");
+        stat4.add(stat4header, BorderLayout.NORTH);
+        stat4.add(stat4result, BorderLayout.SOUTH);
+
+        statright.add(stat3, BorderLayout.WEST);
+        statright.add(stat4, BorderLayout.EAST);
+
+        JPanel statcenter = new JPanel();
+        statcenter.setBorder(BorderFactory.createEmptyBorder(1, 10, 10, 10));
+
+        JPanel stat5 = new JPanel(new BorderLayout());
+        stat5.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel stat6 = new JPanel(new BorderLayout());
+        stat6.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel stat5header = new JLabel("Most total points:");
+        stat5result = new JLabel("");
+        stat5.add(stat5header, BorderLayout.NORTH);
+        stat5.add(stat5result, BorderLayout.SOUTH);
+
+        JLabel stat6header = new JLabel("2Most total points:");
+        stat6result = new JLabel("");
+        stat6.add(stat6header, BorderLayout.NORTH);
+        stat6.add(stat6result, BorderLayout.SOUTH);
+
+        statcenter.add(stat5, BorderLayout.WEST);
+        statcenter.add(stat6, BorderLayout.EAST);
+
         JButton addButton = new JButton("ADD");
+
+        srpanel = new JPanel(new BorderLayout());
+        stats = new JPanel(new BorderLayout());
+        JLabel statlabel = new JLabel("Notable Statistics");
+
+        stats.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        stats.add(statlabel, BorderLayout.NORTH);
+        stats.add(statleft, BorderLayout.WEST);
+        stats.add(statright, BorderLayout.EAST);
+        stats.add(statcenter, BorderLayout.CENTER);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scroll.add(scrollPane);
@@ -124,9 +204,12 @@ public class NbaData extends JPanel {
 
         JButton resetButton = new JButton("RESET DATA");
 
+        srpanel.add(stats, BorderLayout.NORTH);
+        srpanel.add(resetButton, BorderLayout.SOUTH);
+
         add(scroll, BorderLayout.NORTH);
         add(searchAdd, BorderLayout.CENTER);
-        add(resetButton, BorderLayout.SOUTH);
+        add(srpanel, BorderLayout.SOUTH);
 
         JLabel label = new JLabel("Search by player name, team name, year, or all 3! Case sensitive. Example: Name: Stephen Curry, Team: GSW, Year: 2015");
         JLabel l1 = new JLabel("Name", JLabel.CENTER);
@@ -187,8 +270,10 @@ public class NbaData extends JPanel {
 
         addPlayer.setBorder(BorderFactory.createLineBorder(Color.black));
         textFields.setBorder(BorderFactory.createLineBorder(Color.black));
+        stats.setBorder(BorderFactory.createLineBorder(Color.black));
 
-
+        updateStatistics();
+        
         playerText.getDocument().addDocumentListener(
             new DocumentListener() {
                 public void changedUpdate(DocumentEvent e) {
@@ -540,6 +625,26 @@ public class NbaData extends JPanel {
         frame.pack();
         frame.setVisible(true);
     }
+
+    // private void updateStatistics() {
+    //     String content = null;
+    //     try {
+    //         content = new Scanner(new File("../script/queries.sql")).useDelimiter("\\Z").next();
+    //     } catch(FileNotFoundException fnf) {
+    //         System.out.println("Cannot find query script");
+    //     }
+    //     System.out.println(content);
+        
+    //     // if(content != null) {
+    //     //     for(String q : content.split(";\n")) {
+    //     //         try {
+    //     //             s.executeUpdate(q);    
+    //     //         } catch(SQLException sqle) {
+    //     //             sqle.printStackTrace();
+    //     //         }
+    //     //     }
+    //     // }
+    // }
 
     public static void makeConnection() {
         try {

@@ -1,12 +1,3 @@
-/*
-   Populates the Players table.
-
-   Authors:
-   Alex Ye, aye01
-   Robert Franklin Mathews IV, rfmathew
-   Esteban Ray Ramos, eramos04
-*/
-
 INSERT INTO Players(Player,Pos,Age,Team,GP,GS,MIN,FGM,FGA,3PM,3PA,2PM,2PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF,PTS,Year) VALUES ('Quincy Acy','PF',25,'SAC',59,29,876,119,214,19,49,100,165,50,68,65,123,27,29,24,27,103,307,2016);
 INSERT INTO Players(Player,Pos,Age,Team,GP,GS,MIN,FGM,FGA,3PM,3PA,2PM,2PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF,PTS,Year) VALUES ('Jordan Adams','SG',21,'MEM',2,0,15,2,6,0,1,2,5,3,5,0,2,3,3,0,2,2,7,2016);
 INSERT INTO Players(Player,Pos,Age,Team,GP,GS,MIN,FGM,FGA,3PM,3PA,2PM,2PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF,PTS,Year) VALUES ('Steven Adams','C',22,'OKC',80,80,2014,261,426,0,0,261,426,114,196,219,314,62,42,89,84,223,636,2016);
