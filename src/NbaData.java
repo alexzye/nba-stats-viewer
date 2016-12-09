@@ -57,8 +57,8 @@ public class NbaData extends JPanel {
         "../script/table-cleanup.sql",
         "../script/table-setup.sql",
         "../script/create-teams.sql",
-        "../script/create-players-test.sql",
-        "../script/create-mvp-test.sql",
+        "../script/create-players.sql",
+        "../script/create-mvp.sql",
         "../script/create-champions.sql"
     };
 
@@ -125,12 +125,12 @@ public class NbaData extends JPanel {
         JPanel stat2 = new JPanel(new BorderLayout());
         stat2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JLabel stat1header = new JLabel("Most total points:");
+        JLabel stat1header = new JLabel("Most Total Points");
         stat1result = new JLabel("");
         stat1.add(stat1header, BorderLayout.NORTH);
         stat1.add(stat1result, BorderLayout.SOUTH);
 
-        JLabel stat2header = new JLabel("2Most total points:");
+        JLabel stat2header = new JLabel("MVP with Most Total Points");
         stat2result = new JLabel("");
         stat2.add(stat2header, BorderLayout.NORTH);
         stat2.add(stat2result, BorderLayout.SOUTH);
@@ -145,12 +145,12 @@ public class NbaData extends JPanel {
         JPanel stat4 = new JPanel(new BorderLayout());
         stat4.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JLabel stat3header = new JLabel("Most total points:");
+        JLabel stat3header = new JLabel("Team with Worst Shooting %");
         stat3result = new JLabel("");
         stat3.add(stat3header, BorderLayout.NORTH);
         stat3.add(stat3result, BorderLayout.SOUTH);
 
-        JLabel stat4header = new JLabel("2Most total points:");
+        JLabel stat4header = new JLabel("Team with Best Shooting %");
         stat4result = new JLabel("");
         stat4.add(stat4header, BorderLayout.NORTH);
         stat4.add(stat4result, BorderLayout.SOUTH);
@@ -166,12 +166,12 @@ public class NbaData extends JPanel {
         JPanel stat6 = new JPanel(new BorderLayout());
         stat6.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JLabel stat5header = new JLabel("Most total points:");
+        JLabel stat5header = new JLabel("Team with Most Titles");
         stat5result = new JLabel("");
         stat5.add(stat5header, BorderLayout.NORTH);
         stat5.add(stat5result, BorderLayout.SOUTH);
 
-        JLabel stat6header = new JLabel("2Most total points:");
+        JLabel stat6header = new JLabel("Worst Non-Zero Free Throw %");
         stat6result = new JLabel("");
         stat6.add(stat6header, BorderLayout.NORTH);
         stat6.add(stat6result, BorderLayout.SOUTH);
@@ -183,7 +183,7 @@ public class NbaData extends JPanel {
 
         srpanel = new JPanel(new BorderLayout());
         stats = new JPanel(new BorderLayout());
-        JLabel statlabel = new JLabel("Notable Statistics");
+        JLabel statlabel = new JLabel("Notable Statistics(Last 10 Years)");
 
         stats.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         stats.add(statlabel, BorderLayout.NORTH);
@@ -273,7 +273,7 @@ public class NbaData extends JPanel {
         stats.setBorder(BorderFactory.createLineBorder(Color.black));
 
         updateStatistics();
-        
+
         playerText.getDocument().addDocumentListener(
             new DocumentListener() {
                 public void changedUpdate(DocumentEvent e) {
@@ -318,6 +318,7 @@ public class NbaData extends JPanel {
 
         resetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(frame, "Warning: This will take a while.");
                 resetDatabases();
 
                 ResultSet res = null;
@@ -530,7 +531,9 @@ public class NbaData extends JPanel {
                     JOptionPane.showMessageDialog(frame, "Invalid update");
                     col.printStackTrace();
                 }
+                updateStatistics();
             }
+
         });
     }
 
@@ -553,6 +556,7 @@ public class NbaData extends JPanel {
                 }
             }
         }
+        updateStatistics();
     }
 
     /** 
@@ -626,25 +630,47 @@ public class NbaData extends JPanel {
         frame.setVisible(true);
     }
 
-    // private void updateStatistics() {
-    //     String content = null;
-    //     try {
-    //         content = new Scanner(new File("../script/queries.sql")).useDelimiter("\\Z").next();
-    //     } catch(FileNotFoundException fnf) {
-    //         System.out.println("Cannot find query script");
-    //     }
-    //     System.out.println(content);
-        
-    //     // if(content != null) {
-    //     //     for(String q : content.split(";\n")) {
-    //     //         try {
-    //     //             s.executeUpdate(q);    
-    //     //         } catch(SQLException sqle) {
-    //     //             sqle.printStackTrace();
-    //     //         }
-    //     //     }
-    //     // }
-    // }
+    private void updateStatistics() {
+        String content = null;
+        File fil;
+        Scanner scanner;
+        try {
+            fil = new File("../script/queries.sql");
+            scanner = new Scanner(fil).useDelimiter("\\Z");
+            content = scanner.next();
+        } catch(FileNotFoundException fnf) {
+            System.out.println("Cannot find query script");
+        }    
+        if(content != null) {
+            int i = 1;
+            for(String q : content.split(";\n")) {
+                System.out.println(q);
+                try {
+                    ResultSet r = s.executeQuery(q);
+                    r.next();
+                    String result = (String)r.getObject(1);
+                    switch (i) {
+                        case 1:  stat1result.setText(result + " (" + r.getInt("total") + ")");
+                                 break;
+                        case 2:  stat2result.setText(result + " (" + r.getInt("total") + ")");
+                                 break;
+                        case 3:  stat3result.setText(result + " (" + r.getFloat("total") + ")");
+                                 break;
+                        case 4:  stat4result.setText(result + " (" + r.getFloat("total") + ")");
+                                 break;
+                        case 5:  stat5result.setText(result + " (" + r.getInt("total") + ")");
+                                 break; 
+                        case 6:  stat6result.setText(result + " (" + r.getFloat("total") + ")");
+                                 break;
+                    }
+                } catch(SQLException ee) {
+                    ee.printStackTrace();
+                }
+                i++;
+            }
+        }
+
+    }
 
     public static void makeConnection() {
         try {
