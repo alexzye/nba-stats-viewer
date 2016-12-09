@@ -688,7 +688,7 @@ public class NbaData extends JPanel {
         // String db = "nba";
         // String password="password";
 
-        String url = "jdbc:mysql@cslvm74.csc.calpoly.edu/nba";
+        String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/aye01";
         String user ="aye01";
         String password="4207731";
 
@@ -696,7 +696,8 @@ public class NbaData extends JPanel {
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connection made");
         }
-        catch (Exception ex) {
+        catch (SQLException ex) {
+            ex.printStackTrace();
             System.out.println("Could not open connection");
             System.exit(1);
         };
