@@ -698,14 +698,14 @@ public class NbaData extends JPanel {
             System.out.println("Driver not found");
             System.exit(1);
         };
-        
-        // String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/nba";
-        // String user ="admin";
-        // String password="password";
+        // Accesses an aws mysql dbms
+        String url = "jdbc:mysql://nba.ciqzndzyzwah.us-west-1.rds.amazonaws.com:3306/nba";
+        String user ="admin";
+        String password="password";
 
-        String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/aye01";
-        String user ="aye01";
-        String password="4207731";
+        // String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/aye01";
+        // String user ="aye01";
+        // String password="4207731";
 
         try {
             conn = DriverManager.getConnection(url, user, password);
